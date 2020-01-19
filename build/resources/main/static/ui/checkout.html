@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Asset Management System</title>
+
+    <script src="../plugin/jquery/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="../plugin/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../plugin/bootstrap/css/bootstrap-grid.css"/>
+    <link rel="stylesheet" href="../plugin/bootstrap/css/bootstrap-reboot.css"/>
+
+    <script src="../plugin/bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="../plugin/bootstrap/js/bootstrap.js"></script>
+
+
+    <link rel="stylesheet" href="../style/common.css"/>
+    <link rel="stylesheet" href="../style/btn-bs4.css"/>
+    <script src="../script/common.bitproject.earth.lk.v1.js"></script>
+    <script src="../script/ui.bitproject.earth.lk.v1.js"></script>
+
+    <link href="../plugin/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="../plugin/dist/js/select2.min.js"></script>
+
+    <script>
+
+        window.addEventListener("load", initialize);
+
+        /**
+         * initialize buttons
+         */
+        function initialize() {
+            btnSubmit.addEventListener("click",btnAddMC);
+            btnClear.addEventListener("click",btnClearMC);
+          /*  btnUpdate.addEventListener("click",btnUpdateMC);
+            btnDelete.addEventListener("click",btnDeleteMC);
+            btnSearch.addEventListener("click",btnSearchMC);
+            btnSearchClear.addEventListener("click",btnSearchClearMC);*/
+            btnAdd.addEventListener("click",btnAddChoutMC);
+
+            privilages = httpRequest("../privilages?module=CHECKOUT","GET");
+
+            cmbAssetCode.addEventListener("change",cmbAstCodeCH);
+            dteDue.addEventListener("change",duedateCH);
+            cmbNewBranch.addEventListener("change",newBranchCH);
+
+            regexes = httpRequest("../regexes/checkout","GET");
+            txtNote.setAttribute("data-pattern",regexes.notes.regex);
+
+            branches = httpRequest("../branches/list","GET");
+            assets = httpRequest("../assets/listbybranch");
+            employees = httpRequest("../employees/list","GET");
+            assetstatuses = httpRequest("../assetstatuses/list","GET");
+
+            valid = "#c2ffb2";
+            invalid = "#ffe1e1";
+            initial = "white";
+            updated = "#fcf5b5";
+            active = "#fcf5b5";
+
+
+
+            loadView();
+            loadForm();
+        }
+
+        /**
+         * Load the view of table
+         */
+        function loadView() {
+
+            //Search Area
+           /* txtSearchName.value="";
+            txtSearchSNum.value="";
+            fillCombo(cmbSearchCategory,"Category",categories,"name","");
+            fillCombo(cmbSearchAssetstatus,"Status",assetstatuses,"name","");
+            cmbSearchAssetstatus.style.background = "";
+            cmbSearchCategory.style.background = "";
+            txtSearchName.style.background = "";
+            txtSearchSNum.style.background = "";*/
+
+
+            //Table Area
+            activerowno = "";
+            activepage = 1;
+            var query = "&checkoutno=&assetId&=&assetstatusid=";
+            loadTable(1,cmbPageSize.value,query);
+        }
+
+        /**
+         * load the table
+         * @param page
+         * @param size
+         * @param query
+         */
+        function loadTable(page,size,query) {
+            page = page - 1;
+            checkouts = new Array();
+            var data = httpRequest("/checkouts?page="+page+"&size="+size+query,"GET");
+            if(data.content!= undefined) checkouts = data.content;
+            createPagination('pagination',data.totalPages, data.number+1,paginate);
+            fillTable('tblCheckout',checkouts,fillForm);
+            clearSelection(tblCheckout);
+            if(activerowno!="")selectRow(tblCheckout,activerowno,active);
+            window.location.href="#ui";
+        }
+
+        /**
+         *
+         * @param page
+         */
+        function paginate(page) {
+            var paginate;
+            if(oldcheckout==null){
+                paginate=true;
+            }else{
+                if(getErrors()==''&&getUpdates()==''){
+                    paginate=true;
+                }else{
+                    paginate = window.confirm("Form has Some Errors or Update Values. " +
+                        "Are you sure to discard that changes ?");
+                }
+            }
+            if(paginate) {
+                activepage=page;
+                activerowno=""
+                loadSearchedTable();
+                loadForm();
+            }
+
+        }
+
+        /**
+         * Form to enter details of asset
+         */
+        function loadForm() {
+            checkout = new Object();
+            oldcheckout = null;
+
+            checkout.assetcheckoutList = new Array();
+
+            choutNo= httpRequest("../checkouts/choutNo","GET");
+            //console.log("111",choutNo.no);
+            txtChoutNo.value = choutNo.no;
+            checkout.checkoutno = txtChoutNo.value;
+            txtChoutNo.disabled=true;
+            txtChoutNo.style.background=valid;
+
+            fillCombo(cmbBranch,"Select Branch",branches,"name",session.getObject("user").employeeId.branchId.name);
+            checkout.branchId = JSON.parse(cmbBranch.value);
+            cmbBranch.disabled=true;
+            fillCombo(cmbNewBranch,"Select new branch",branches,"name","");
+            fillCombo(cmbNewHolder,"Select new holder",employees,"callingname","");
+            fillCombo(cmbNewStatus,"Select new status",assetstatuses,"name","Transferred");
+            checkout.assetstatusId = JSON.parse(cmbNewStatus.value);
+            checkout.assetcheckoutList.assetstatusId = JSON.parse(cmbNewStatus.value);
+            cmbNewStatus.disabled=true;
+
+            var today = new Date();
+            var month = today.getMonth()+1;
+            if(month<10) month = "0"+month;
+            var date = today.getDate();
+            if(date<10) date = "0"+date;
+            dteChout.value=today.getFullYear()+"-"+month+"-"+date;
+            checkout.choutdate=dteChout.value;
+            dteChout.style.background=valid;
+            dteChout.disabled = "";
+
+            checkout.duedate=dteDue.value;
+            dteDue.disabled = "";
+
+            fillCombo(cmbEmployee,"Select",employees,"callingname",session.getObject("user").employeeId.callingname);
+            checkout.employeeId = JSON.parse(cmbEmployee.value);
+            cmbEmployee.disabled = true;
+
+            setStyle(initial);
+
+            refreshInnerForm();
+
+            disableButtons(false, true, true);
+        }
+
+
+        function refreshInnerForm() {
+            txtName.value="";
+            txtStatus.value="";
+            txtStatus.style.background=initial;
+            //txtDescription.value="";
+            assetsbybranch = httpRequest("../assets/listbybranch?branchId="+JSON.parse(cmbBranch.value).id,"GET");
+            fillCombo(cmbAssetCode,"Selecet Code",assetsbybranch,"assetcode","");
+
+            fillInnerTable("tblChoutAsset", checkout.assetcheckoutList ,removeItem);
+
+        }
+
+
+        function removeItem(assetcheckoutList,index) {
+            checkout.assetcheckoutList.splice(index-1, 1);
+            refreshInnerForm();
+        }
+
+        function cmbAstCodeCH(){
+            txtName.value= JSON.parse(cmbAssetCode.value).name;
+            txtName.disabled = true;
+            txtStatus.value = JSON.parse(cmbAssetCode.value).assetstatusId.name;
+            txtStatus.disabled = true;
+           // txtDescription.value = JSON.parse(cmbAssetCode.value).assetId.description;
+
+            if(txtStatus.value != "Available"){
+                txtStatus.style.background=invalid;
+            }
+            else{
+                txtStatus.style.background=valid;
+            }
+
+        }
+
+        function duedateCH() {
+            if(dteChout.value > dteDue.value ){
+                dteDue.style.background = invalid;
+            }
+            else{
+                dteDue.style.background = valid;
+            }
+
+        }
+
+        function newBranchCH(){
+            if(cmbBranch.value == cmbNewBranch.value){
+                cmbNewBranch.style.background=invalid;
+            }
+            else{
+                cmbNewBranch.style.background=valid;
+            }
+        }
+
+
+        /**
+         * Add innerform data
+         * */
+        function btnAddChoutMC() {
+
+            choutasset = new Object();
+            choutasset.assetId = JSON.parse(cmbAssetCode.value);
+
+          /*  if(isNaN(txtQuantity.value)){
+                txtQuantity.style.background=invalid;
+            }else {
+                purchasorderitem.qty = txtQuantity.value.trim();
+                purchasorderitem.linetotal = parseInt(txtPurchasprice.value) * purchasorderitem.qty;
+                purchasorder.porderitemList.push(purchasorderitem);
+                refreshInnerForm();
+            }*/
+
+            checkout.assetcheckoutList.push(choutasset);
+            refreshInnerForm();
+
+
+
+
+        }
+
+        /**
+         * set Styles for the fields of the form
+         * @param style
+         */
+        function setStyle(style) {
+            cmbAssetCode.style.background = style;
+            txtName.style.background = style;
+            txtStatus.style.background = style;
+            cmbNewBranch.style.background=style;
+            cmbNewHolder.style.background=style;
+            dteDue.style.background=style;
+            txtNote.style.background=style;
+
+        }
+
+        /**
+         * define the buttons to be disabled
+         * @param add
+         * @param upd
+         * @param del
+         */
+        function disableButtons(add, upd, del) {
+
+            if (add || !privilages.add) btnAdd.setAttribute("disabled", "disabled");
+            else btnAdd.removeAttribute("disabled");
+
+            if (upd || !privilages.update) btnUpdate.setAttribute("disabled", "disabled");
+            else btnUpdate.removeAttribute("disabled");
+
+            if (del || !privilages.delete) btnDelete.setAttribute("disabled", "disabled");
+            else btnDelete.removeAttribute("disabled");
+
+        }
+
+
+        // Binding and Validation Functions for Non-Regex-Based
+        // When Regex-Based default validation is used, programmers do not need to define these functions
+        // Default Validation and Binding is coded in "ui.bitproject.earth.lk.js"
+
+
+        /**
+         * return error messages
+         * @returns {string}
+         */
+        function getErrors() {
+
+            var errors = "";
+
+            if(checkout.assetcheckoutList.length == 0 )
+                errors = errors + "\n" + "Assets not selected";
+
+            if(checkout.branchId == null )
+                errors = errors + "\n" + "New branch not selected";
+
+            if(checkout.newholderId == null )
+                errors = errors + "\n" + "New holder not selected";
+
+            if(checkout.choutdate == null )
+                errors = errors + "\n" + "Check out date not selected";
+
+            if(checkout.duedate == null )
+                errors = errors + "\n" + "Due date not selected";
+
+            return errors;
+        }
+
+        /**
+         * Add checkout deatils
+         */
+        function btnAddMC() {
+
+          var errors = getErrors();
+
+            if(errors=="") {
+                var assetlist="";
+                for(x in checkout.assetcheckoutList)
+                    assetlist = assetlist + (assetlist==""?"":", ") +checkout.assetcheckoutList[x].assetId.name
+
+                var assetcodelist="";
+                for(x in checkout.assetcheckoutList)
+                    assetcodelist = assetcodelist + (assetcodelist==""?"":", ") +checkout.assetcheckoutList[x].assetId.assetcode
+
+                var assetstatuslist="";
+                for(x in checkout.assetcheckoutList)
+                    assetstatuslist = assetstatuslist + (assetstatuslist==""?"":", ") +checkout.assetcheckoutList[x].assetId.assetstatusId.name
+
+                var option = window.confirm("Are you sure to add following checkout ?\n" +
+                    "\nCheckout No      : " + checkout.checkoutno+
+                    "\nAsset Code       : " + assetcodelist+
+                    "\nAsset Name       : " + assetlist +
+                    "\nAsset Status     : " + assetstatuslist +
+                    "\nNew Branch       : " + checkout.branchId.name +
+                    "\nNew Holder       : " + checkout.newholderId.callingname +
+                    "\nNew Asset status : " + checkout.assetstatusId.name +
+                    "\nCheck-out date   : " + checkout.choutdate +
+                    "\nDue-date         : " + checkout.duedate +
+                    "\nCheck-out Notes  : " + checkout.notes +
+                    "\nCreated by       : " + checkout.employeeId.callingname);
+
+                if(option==true) {
+                    var response = httpRequest("/checkouts","POST",checkout);
+                    if(response=="0"){
+                        toast("<strong>Success!</strong> Saved Successfully","success");
+                        loadForm();
+                        activerowno = 1;
+                        loadSearchedTable();
+                    }
+                    else window.alert("Failed to Add as \n\n"+response);
+                }
+
+            }
+            else
+            { window.alert("You have following Errors\n"+errors); }
+
+        }
+
+        /**
+         * actions to be done when click on clear button
+         */
+        function btnClearMC() {
+            //Get Cofirmation from the User window.confirm();
+            var clear;
+            if(oldcheckout==null){
+                clear=true;
+            }else{
+                if(getErrors()==''&&getUpdates()==''){
+                    clear=true;
+                }else{
+                    clear = window.confirm("Form has Some Errors or Update Values. " +
+                        "Are you sure to discard that changes ?");
+                }
+            }
+            if(clear) {
+                loadForm();
+                clearSelection(tblCheckout);
+            }
+        }
+
+        /**
+         * fill in the form with user details
+         * @param chout
+         * @param rowno
+         */
+        function fillForm(chout,rowno){
+            activerowno = rowno;
+            var filling;
+            if(oldcheckout==null){
+                filling=true;
+            }else{
+
+                if(getErrors()==''&&getUpdates()==''){
+                    filling=true;
+                }else{
+                    filling = window.confirm("Form has Some Errors or Update Values. " +
+                        "Are you sure to discard that changes ?");
+                }
+            }
+
+            if(filling) {
+
+                clearSelection(tblCheckout);
+                selectRow(tblCheckout,activerowno,active);
+
+                checkout = JSON.parse(JSON.stringify(chout));
+                oldcheckout = JSON.parse(JSON.stringify(chout));
+
+                txtChoutNo.value = checkout.checkoutno;
+                txtChoutNo.disabled = true;
+                fillCombo(cmbBranch,"",branches,"name",session.getObject("user").employeeId.branchId.name);
+                fillCombo(cmbNewBranch,"",branches,"name", checkout.branchId.name );
+                fillCombo(cmbNewHolder,"","callingname", checkout.newholderId.callingname);
+                fillCombo(cmbNewStatus,"","name",checkout.assetstatusId.name);
+                dteChout.value = checkout.choutdate;
+                dteDue.value = checkout.duedate;
+                txtNote.value = checkout.notes;
+                fillCombo(cmbEmployee,"Select",employees,"callingname",session.getObject("user").employeeId.callingname);
+
+                refreshInnerForm();
+
+                disableButtons(true, false, false);
+                setStyle(valid);
+            }
+
+        }
+
+        function getUpdates() {
+
+            var updates = "";
+
+          if(checkout!=null && oldcheckout!=null) {
+
+              if (checkout.checkoutno != oldcheckout.checkoutno)
+                  updates = updates + "\nCheckout Number is Changed";
+
+              if (checkout.branchId.name != oldcheckout.branchId.name)
+                  updates = updates + "\nBranch is Changed";
+
+              if (checkout.currentLocation.name != oldcheckout.currentLocation.name)
+                  updates = updates + "\nCurrent Location is Changed";
+
+              if (checkout.photo != oldcheckout.photo)
+                  updates = updates + "\nPhoto is Changed";
+
+              if (checkout.purchasePrice != oldcheckout.purchasePrice)
+                  updates = updates + "\nPurchase price is Changed";
+
+              if (checkout.dointroduced != oldcheckout.dointroduced)
+                  updates = updates + "\nIntroduced date is Changed";
+
+              if (checkout.checkoutstatusId.name != oldcheckout.checkoutstatusId.name)
+                  updates = updates + "\nAsset Status is Changed";
+
+              if (checkout.description != oldcheckout.description)
+                  updates = updates + "\nDescription is Changed";
+
+              if (checkout.holderId.callingname != oldcheckout.holderId.callingname)
+                  updates = updates + "\nAsset holder is Changed";
+
+              if (checkout.empIntroduced.callingname != oldcheckout.empIntroduced.callingname)
+                  updates = updates + "\nEmployee introduced is Changed";
+
+          }
+
+            return updates;
+        }
+
+        function btnUpdateMC() {
+            /*var errors = getErrors();
+            if (errors == "") {
+                var updates = getUpdates();
+                if (updates == "") window.alert("Nothing Updated!");
+                else {
+
+                    var option = window.confirm("\n\nAre your sure to update followings ! \n\n" + updates);
+                    if(option==true) {
+                        var response = httpRequest("/assets","PUT",asset);
+                        if(response=="0"){
+                            toast("<strong>Success !</strong> Updated Successfully","success");
+                            loadForm();
+                            loadSearchedTable();
+
+                        }
+                        else window.alert("Failed to Update as \n\n"+response);
+                    }
+
+
+                }
+            }
+            else
+                window.alert("You have following errors in your form\n\n"+getErrors());*/
+        }
+
+        function btnDeleteMC() {
+
+/*
+
+            var option = window.confirm("\n\nAre your sure to delete following ! \n\n" +
+                "Asset Code : " +asset.assetcode+ "\nName : " +asset.name);
+
+            if(option==true) {
+                var response = httpRequest("/assets","DELETE",asset);
+                if(response=="0"){
+                    toast("<strong>Success !</strong> Deleted Successfully","success");
+                    loadForm();
+                    loadSearchedTable();
+
+                }
+                else window.alert("Failed to Delete as \n\n"+response);
+            }
+*/
+
+        }
+
+
+        //Search Functions
+
+        function loadSearchedTable() {
+
+           /* var code = txtSearchCode.value;
+            var name = txtSearchName.value;
+            var serialNum = txtSearchSNum.value;
+            var category = cmbSearchCategory.value;
+
+            var categoryid="";
+            if(category!="Category")
+            { categoryid = JSON.parse(category).id;
+                cmbSearchCategory.style.background = active;}
+
+            if(code!=""){  txtSearchCode.style.background = active; }
+            if(name!=""){  txtSearchName.style.background = active; }
+            if(serialNum!=""){  txtSearchSNum.style.background = active; }
+
+            var query ="&code=&name=&serialNum=&categoryid=";
+
+            if(code!="" || name!="" || serialNum!="" || categoryid!="" )
+                query = "&code=" + code + "&name=" + name + "&serialNum=" + serialNum + "&categoryid=" + categoryid;
+
+            //window.alert(query);
+            loadTable(activepage, cmbPageSize.value, query);
+*/
+        }
+
+        function btnSearchMC(){
+            activepage=1;
+            loadSearchedTable();
+        }
+
+        function btnSearchClearMC(){
+            loadView();
+        }
+
+
+
+    </script>
+
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row" id="ui">
+        <div class="col-md-12">
+            <div class="card" style="margin-top: 10px;">
+                <div class="card-header">
+                    <h3>Asset Check-out</h3>
+                </div>
+
+                <div class="card-body" >
+
+                    <div class="row">
+
+                        <div class="col-md-4" id="form">
+                            <form class="form-horizontal" onsubmit="return false" id="checkoutform" >
+                                <script>
+                                    textField('checkoutform','txtChoutNo','Checkout No','Enter Checkout Number','',4,"",'checkout','checkoutno','oldcheckout');
+                                    comboBox('checkoutform','cmbBranch','Current Branch',4,'checkout','','oldcheckout');
+                                </script>
+
+                                <!--<script>
+                                    $(document).ready(function() {
+                                        $('.js-example-basic-single').select2();
+                                    });
+                                </script>
+
+                                <select class="js-example-basic-single" name="state" style="width:60%">
+                                    <option value="AL">Alabama</option>
+                                    <option value="WY">Wyoming</option>
+                                </select>-->
+
+
+                                <div id="innerform" style="background-color: #f2f2f2; padding:20px 10px;margin-bottom: 15px">
+
+                                    <script>
+                                        comboBox('innerform','cmbAssetCode','Asset Code*',4,'','','');
+                                        textField('innerform','txtName','Asset Name','Enter Name Here','',4,"",'','','');
+                                        textField('innerform','txtStatus','Asset Status','Enter Status Here','',4,"",'','','');
+                                        /*textArea('innerform','txtDescription','Description','Enter description Here','',4,"",'','','');*/
+                                    </script>
+                                    <div class="text-right">
+                                        <input class="btn btn-primary btn-sm" type="button" id="btnAdd" value="Add" style="width: 15%"/>
+                                    </div>
+                                    <hr/>
+                                    <div class="table-responsive" id="tableInnerParent">
+
+                                        <script>
+                                            var metadatainnertable = [
+                                                {name:'Code',search:false,datatype:'text',property:'assetId.assetcode'},
+                                                {name:'Name',search:false,datatype:'text',property:'assetId.name'},
+                                                {name:'Status',search:false,datatype:'text',property:'assetId.assetstatusId.name'}
+                                            ];
+                                            tableForInnerForm("tableInnerParent","tblChoutAsset",metadatainnertable,false);
+
+                                        </script>
+
+
+                                    </div>
+                                </div>
+                                    <script>
+                                    comboBox('checkoutform','cmbNewBranch','New Branch*',4,'checkout','branchId','oldcheckout');
+                                    comboBox('checkoutform','cmbNewHolder','New Holder',4,'checkout','newholderId','oldcheckout');
+                                    comboBox('checkoutform','cmbNewStatus','New status',4,'checkout','','oldcheckout');
+                                    dateField('checkoutform','dteChout','Check-out date*','Select Date*',4,"",'checkout','choutdate','oldcheckout');
+                                    dateField('checkoutform','dteDue','Due-date*','Select Date',4,"",'checkout','duedate','oldcheckout');
+                                    textArea('checkoutform','txtNote','Check-out Notes','Enter notes Here','',4,"",'checkout','notes','oldcheckout');
+                                    comboBox('checkoutform','cmbEmployee','Created by',4,'checkout','employeeId','oldcheckout');
+                                </script>
+
+                                <div class="text-right">
+                                    <input class="btn btn-primary btn-sm" type="button" id="btnSubmit" value="Submit" style="width: 15%"/>
+                                    <input class="btn btn-primary btn-sm" type="button" id="btnUpdate" value="Update" style="width: 15%"/>
+                                    <input class="btn btn-secondary btn-sm" type="button" id="btnClear" value="Cancel" style="width: 15%"/>
+                                    <input class="btn btn-secondary btn-sm" type="button" id="btnDelete" value="Delete" style="width: 15%"/>
+                                </div>
+
+
+                            </form>
+                        </div>
+
+                        <div class="col-md-1">
+
+                        </div>
+
+                        <div class="col-md-7" id="choutview">
+                            <form class="form-inline" onsubmit="return false">
+                                <div class="form-group form-group-sm">
+                                    <input placeholder="Search By Checkout No" class="form-control" type="text" id="txtSearchChoutNo"/>
+                                </div>
+                                <div class="form-group form-group-sm">
+                                    <input placeholder="Search By Asset Code" class="form-control" type="text" id="txtSearchAssetCode"/>
+                                </div>
+                                <div class="form-group form-group-sm">
+                                    <input placeholder="Search By Asset Name" class="form-control" type="text" id="txtSearchAssetName"/>
+                                </div>
+
+                                <input type="button" class="btn btn-primary btn-sm" value="Search" id="btnSearch"/>
+                                <input type="button" class="btn btn-secondary btn-sm" value="Clear" id="btnSearchClear"/>
+
+                            </form>
+                            <hr/>
+                            <div class="table-responsive" id="tableParent">
+
+                                <script>
+                                    function getAssetColumn(ob) {
+                                        var assetList="";
+                                        for(x in ob.assetcheckoutList)
+                                            assetList = assetList + (assetList==""?"":", ") +ob.assetcheckoutList[x].assetId.name;
+                                        return assetList;
+                                    }
+
+                                    var metadata = [
+                                        {name:'Checkout No',search:true,datatype:'text',property:'checkoutno'},
+                                        {name:'Asset Name',search:true,datatype:'text',property:getAssetColumn},
+                                        {name:'Checkout date',search:true,datatype:'text',property:'choutdate'},
+                                        {name:'Due date',search:true,datatype:'text',property:'duedate'},
+                                        {name:'New Branch',search:true,datatype:'text',property:'branchId.name'}
+                                    ];
+                                    table("tableParent","tblCheckout",metadata,[3,10,15,30,500,1000],btnSearchMC,true);
+
+                                </script>
+
+
+                            </div>
+                            <ul id="pagination" class="pagination"></ul>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <div class="card-footer">
+                    <div id="err">
+                        <h3>Error Log</h3>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

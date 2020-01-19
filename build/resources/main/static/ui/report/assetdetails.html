@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+<head>
+
+    <!-- <script src="../plugin/jquery/jquery.min.js"></script>
+
+   <link rel="stylesheet" href="../plugin/bootstrap/css/bootstrap.css"/>
+     <link rel="stylesheet" href="../plugin/bootstrap/css/bootstrap-grid.css"/>
+     <link rel="stylesheet" href="../plugin/bootstrap/css/bootstrap-reboot.css"/>
+
+     <script src="../plugin/bootstrap/js/bootstrap.bundle.js"></script>
+     <script src="../plugin/bootstrap/js/bootstrap.js"></script>-->
+
+    <script src="../../plugin/jquery/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="../../plugin/bootstrap/css/bootstrap.min.css"/>
+    <script src="../../plugin/bootstrap/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="../style/common.css"/>
+    <link rel="stylesheet" href="../style/btn-bs4.css"/>
+    <script src="../../script/common.bitproject.earth.lk.v1.js"></script>
+    <script src="../../script/ui.bitproject.earth.lk.v2.js"></script>
+
+    <script src="https://kit.fontawesome.com/8046620caa.js" crossorigin="anonymous"></script>
+
+
+
+    <!--Load the AJAX API-->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+
+        window.addEventListener("load", initialize);
+
+        function initialize(){
+            btnGenarateReport.addEventListener("click",btnGenarateReportMC);
+            btnClear.addEventListener("click",btnClearMC);
+            btnPrintPiechart.addEventListener("click",btnPrintPiechartMC);
+            btnPrintTable.addEventListener("click",btnPrintTableMC);
+            btnPrintAllReport.addEventListener("click",btnPrintAllReportMC);
+
+            colors = ["red","green","blue","orange","yellow","cyan","magenta","gray","gold","purple"];
+
+            serverdata=httpRequest("../../reports/assetdetails","GET");
+            loadReports();
+        }
+
+        function loadReports() {
+            var columns = [{type:"string",name:"assetcode"},{type:"string",name:"name"},{type:"currency",name:"purchase_price"}];
+            drawReportTable('tbl',serverdata,columns);
+            drawPieChart('pch',serverdata,'designation','attempt','Sample Title',600,600,colors);
+           drawColumnChart('colch',serverdata,'designation','attempt','Sample Title',600,600,colors);
+        }
+
+        function btnGenarateReportMC(){
+            var startdate = dteStart.value;
+            var enddate = dteEnd.value;
+            if(startdate!="" && enddate!="") {
+                serverdata = httpRequest("../../reports/systemaccessanalysis?startdate=" + startdate + "&enddate=" + enddate, "GET");
+                loadReports();
+            }
+        }
+
+        function btnClearMC() {
+            serverdata=httpRequest("../../reports/systemaccessanalysis","GET");
+            dteStart.value="";
+            dteEnd.value="";
+            loadReports();
+        }
+
+
+        function btnPrintTableMC() {
+            printDiv("tableview",370,370,400,"../../image/sampleitem.jpg");
+        }
+
+        function btnPrintPiechartMC() {
+            printDiv("piechartview",800,800,400,"../../image/sampleitem.jpg");
+        }
+
+        function btnPrintAllReportMC() {
+            printDiv("allreport",800,800,400,"../../image/sampleitem.jpg");
+        }
+
+    </script>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid">
+    <div class="row" id="ui">
+        <div class="col-md-12">
+            <div class="card " style="margin-top: 10px;">
+                <div class="card-header">
+                    <h3>Asset details Report </h3>
+                </div>
+
+                <div class="card-body" >
+
+                    <div class="row">
+
+                        <div class="col-md-12" id="ondemandcriteria">
+                            <form class="form-inline" onsubmit="return false">
+                                <div class="form-group form-group-sm">
+                                    <input placeholder="Start Date" class="form-control" type="date" id="dteStart"/>
+                                </div>
+                                <div class="form-group form-group-sm">
+                                    <input placeholder="End Date" class="form-control" type="date" id="dteEnd"/>
+                                </div>
+
+
+                                <input type="button" class="btn btn-secondary btn-sm" value="Clear" id="btnClear"/>
+                                <input type="button" class="btn btn-primary btn-sm" value="Genarate Report" id="btnGenarateReport"/>
+
+                                <div class="text-right" style="margin-top: 10px;">
+                                   <!-- <button class="btn btn-primary btn-sm"  id="btnPrintTable" > <i class="fa fa-print fa-fw"></i> Print Table  </button>
+                                    <button class="btn btn-primary btn-sm"  id="btnPrintPiechart" > <i class="fa fa-print fa-fw"></i> Print Piechart  </button>-->
+                                    <button class="btn btn-primary btn-sm"  id="btnPrintAllReport"  style="align-items: center  "> <i class="fa fa-print fa-fw"></i> Print Report  </button>
+
+                                </div>
+
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="row" style="height: 50px;">
+                    </div>
+
+                    <div class="row" id="allreport">
+
+                        <div class="col-md-3" id="tableview"> <h2>Asset details Report</h2> <hr/> <div id="tbl"></div>   </div>
+                        <div class="col-md-1" ></div>
+
+                        <div class="col-md-3" id="piechartview"> <h2>Asset details Report</h2> <hr/> <div id="pch"></div>   </div>
+                        <div class="col-md-1" ></div>
+
+                        <div class="col-md-4" id="barchartview"> <h2>Asset details Report</h2> <hr/> <div id="colch"></div> </div>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+                    <div id="err">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

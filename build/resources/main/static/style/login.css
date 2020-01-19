@@ -1,0 +1,16 @@
+body{
+    background: url("../image/office2.png") no-repeat center center fixed;
+    background-size: cover;
+}
+
+.modal-content{
+    background-color: #3b4652;
+    opacity: .95;
+    width: 350px;
+}
+
+.modal-header{
+    font-family: Arial;
+    color: #fff;
+
+}
