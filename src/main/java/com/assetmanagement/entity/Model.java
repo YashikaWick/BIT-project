@@ -45,7 +45,8 @@ public class Model implements Serializable {
     private Integer id;
     @Column(name = "name")
     private String name;
-
+    @Column(name = "description")
+    private String description;
     @JoinColumn(name = "brand_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Brand brandId;
@@ -94,6 +95,14 @@ public class Model implements Serializable {
 
     public void setBrandId(Brand brandId) {
         this.brandId = brandId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @XmlTransient

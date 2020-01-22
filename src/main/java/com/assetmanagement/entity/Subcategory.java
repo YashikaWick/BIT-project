@@ -52,6 +52,9 @@ public class Subcategory implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Category categoryId;
 
+    @Column(name = "description")
+    private String description;
+
     public Subcategory() {
     }
 
@@ -84,6 +87,14 @@ public class Subcategory implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @XmlTransient

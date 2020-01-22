@@ -90,7 +90,6 @@ public class Asset implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Branch branchId;
 
-
     @JoinColumn(name = "brand_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Brand brandId;

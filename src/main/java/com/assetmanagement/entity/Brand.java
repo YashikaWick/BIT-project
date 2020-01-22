@@ -45,6 +45,9 @@ public class Brand implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "brandId", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Asset> assetList;
@@ -83,6 +86,14 @@ public class Brand implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @XmlTransient
