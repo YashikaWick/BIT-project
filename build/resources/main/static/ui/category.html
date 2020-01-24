@@ -487,12 +487,10 @@
 
                                 <script>
 
-                                    function getNameColumn(ob) {
-                                        return ob.callingname+"("+ob.number+")";
-                                    }
+                                  
 
                                     var metadata = [
-                                        {name:'Name',search:true,datatype:'text',property:getNameColumn}
+                                        {name:'Name',search:true,datatype:'text',property:'name'}
 
                                     ];
                                     table("tableParent","tblCategory",metadata,[3,10,15,30,500,1000],btnSearchMC,true);
