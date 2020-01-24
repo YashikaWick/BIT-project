@@ -177,21 +177,8 @@
 
            if(errors=="") {
                 var option = window.confirm("Are you sure to add following Employee ?\n" +
-                    "\nNumber          : " + employee.number +
-                    "\nFull Name       : " + employee.fullname +
-                    "\nCalling Name    : " + employee.callingname +
-                    "\nGender          : " + employee.genderId.name +
-                    "\nCivil Status    : " + employee.civilstatusId.name +
-                    "\nNIC             : " + employee.nic +
-                    "\nBirth Date      : " + employee.dobirth +
-                    "\nPhoto           : " + employee.photoname +
-                    "\nAddress         : " + employee.address +
-                    "\nMobile          : " + employee.mobile +
-                    "\nLand            : " + employee.land +
-                    "\nDesignation     : " + employee.designationId.name +
-                    "\nAssignment Date : " + employee.doassignment +
-                    "\nDescription     : " + employee.description +
-                    "\nEmployee Status : " + employee.employeestatusId.name);
+                    "\nCategory          : " + category.name +
+                    "\nDescription       : " + category.description );
                 if(option==true) {
                   var response = httpRequest("/employees","POST",employee);
                     if(response=="0"){
@@ -487,7 +474,6 @@
 
                                 <script>
 
-                                  
 
                                     var metadata = [
                                         {name:'Name',search:true,datatype:'text',property:'name'}

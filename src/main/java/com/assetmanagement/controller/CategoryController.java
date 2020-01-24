@@ -7,6 +7,7 @@ import com.assetmanagement.util.ModuleList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,4 +32,27 @@ public class CategoryController {
     public List<Category> categories() {
         return dao.list();
     }
+
+
+    @RequestMapping(value = "/categories", method = RequestMethod.POST)
+    public String add(@CookieValue(value="username", required=false) String username, @CookieValue(value="password", required=false) String password, @Validated @RequestBody Category category) {
+
+        if(AuthProvider.isAuthorized(username,password,ModuleList.EMPLOYEE,AuthProvider.INSERT)) {
+            Category name = (Category) dao.findByName(category.getName());
+
+            if (name != null)
+                return "Error-Validation : NIC Exists";
+
+            else
+                try {
+                    dao.save(category);
+                    return "0";
+                } catch (Exception e) {
+                    return "Error-Saving : " + e.getMessage();
+                }
+        }
+        return "Error-Saving : You have no Permission";
+
+    }
+
 }
