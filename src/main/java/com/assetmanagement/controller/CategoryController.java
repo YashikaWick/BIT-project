@@ -37,13 +37,11 @@ public class CategoryController {
     @RequestMapping(value = "/categories", method = RequestMethod.POST)
     public String add(@CookieValue(value="username", required=false) String username, @CookieValue(value="password", required=false) String password, @Validated @RequestBody Category category) {
 
-        if(AuthProvider.isAuthorized(username,password,ModuleList.EMPLOYEE,AuthProvider.INSERT)) {
-            Category name = (Category) dao.findByName(category.getName());
+        if(AuthProvider.isAuthorized(username,password,ModuleList.CATEGORY,AuthProvider.INSERT)) {
 
-            if (name != null)
-                return "Error-Validation : NIC Exists";
 
-            else
+
+
                 try {
                     dao.save(category);
                     return "0";
@@ -54,5 +52,39 @@ public class CategoryController {
         return "Error-Saving : You have no Permission";
 
     }
+
+    @RequestMapping(value = "/categories", method = RequestMethod.PUT)
+    public String update(@CookieValue(value="username", required=false) String username, @CookieValue(value="password", required=false) String password,@Validated @RequestBody Category category) {
+
+        if(AuthProvider.isAuthorized(username,password,ModuleList.CATEGORY,AuthProvider.UPDATE)) {
+
+                try {
+                    dao.save(category);
+                    return "0";
+                }
+                catch(Exception e) {
+                    return "Error-Updating : "+e.getMessage();
+                }
+            }
+
+
+        return "Error-Updating : You have no Permission";
+    }
+
+    @RequestMapping(value = "/categories", method = RequestMethod.DELETE)
+    public String delete(@CookieValue(value="username", required=false) String username, @CookieValue(value="password", required=false) String password,@RequestBody Category category ) {
+        if(AuthProvider.isAuthorized(username,password,ModuleList.CATEGORY,AuthProvider.DELETE)) {
+            try {
+                dao.delete(dao.getOne(category.getId()));
+                return "0";
+            }
+            catch(Exception e) {
+                return "Error-Deleting : "+e.getMessage();
+            }
+        }
+        return "Error-Deleting : You have no Permission";
+
+    }
+
 
 }
