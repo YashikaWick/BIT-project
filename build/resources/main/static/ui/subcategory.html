@@ -26,9 +26,9 @@
         //Initializing Functions
 
         function initialize() {
-/*
+
             btnAdd.addEventListener("click",btnAddMC);
-            btnClear.addEventListener("click",btnClearMC);
+    /*        btnClear.addEventListener("click",btnClearMC);
             btnUpdate.addEventListener("click",btnUpdateMC);
             btnDelete.addEventListener("click",btnDeleteMC);
             dteDOBirth.onchange = dteDOBirthCH;
@@ -173,9 +173,9 @@
                 var option = window.confirm("Are you sure to add following Employee ?\n" +
                     "\nName        : " + subcategory.name +
                     "\nCategory    : " + subcategory.categoryId.name +
-                    "\nDescription : " + employee.description);
+                    "\nDescription : " + subcategory.description);
                 if(option==true) {
-                  var response = httpRequest("/employees","POST",employee);
+                  var response = httpRequest("/subcategories","POST",subcategory);
                     if(response=="0"){
                     toast("<strong>Success !</strong> Saved Successfully","success");
                     loadForm();

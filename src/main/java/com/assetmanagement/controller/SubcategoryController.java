@@ -2,11 +2,13 @@ package com.assetmanagement.controller;
 
 import com.assetmanagement.dao.SubcategoryDao;
 import com.assetmanagement.entity.Category;
+import com.assetmanagement.entity.Employee;
 import com.assetmanagement.entity.Subcategory;
 import com.assetmanagement.util.ModuleList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,5 +43,22 @@ public class SubcategoryController {
     @RequestMapping(value = "/subcategories/list", method = RequestMethod.GET, produces = "application/json")
     public List<Subcategory> subcategories() {
         return dao.list();
+    }
+
+    @RequestMapping(value = "/subcategories", method = RequestMethod.POST)
+    public String add(@CookieValue(value="username", required=false) String username, @CookieValue(value="password", required=false) String password, @Validated @RequestBody Subcategory subcategory) {
+
+        if(AuthProvider.isAuthorized(username,password,ModuleList.SUBCATEGORY,AuthProvider.INSERT)) {
+
+
+                try {
+                    dao.save(subcategory);
+                    return "0";
+                } catch (Exception e) {
+                    return "Error-Saving : " + e.getMessage();
+                }
+        }
+        return "Error-Saving : You have no Permission";
+
     }
 }
