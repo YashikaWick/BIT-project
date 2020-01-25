@@ -42,8 +42,11 @@ public class RegexController {
     @RequestMapping(value = "/checkout", produces = "application/json")
     public HashMap<String, HashMap<String, String>> checkout() { return getRegex(new Checkout()); }
 
-    @RequestMapping(value = "/reserve", produces = "application/json")
-    public HashMap<String, HashMap<String, String>> reserve() { return getRegex(new Checkout()); }
+    @RequestMapping(value = "/category", produces = "application/json")
+    public HashMap<String, HashMap<String, String>> category() { return getRegex(new Category()); }
+
+    @RequestMapping(value = "/subcategory", produces = "application/json")
+    public HashMap<String, HashMap<String, String>> subcategory() { return getRegex(new Subcategory()); }
 
 
     public static <T> HashMap<String, HashMap<String, String>> getRegex(T t) {

@@ -23,6 +23,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -44,6 +45,7 @@ public class Subcategory implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Column(name = "name")
+    @Pattern(regexp = "^[\\$_a-zA-Z]+[\\$_\\w\\W]*$", message = "Invalid Sub Category name")
     private String name;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "subcategoryId", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -53,6 +55,7 @@ public class Subcategory implements Serializable {
     private Category categoryId;
 
     @Column(name = "description")
+    @Pattern(regexp = "^.*$", message = "Invalid Description")
     private String description;
 
     public Subcategory() {

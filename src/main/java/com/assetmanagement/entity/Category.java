@@ -21,6 +21,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -44,9 +45,11 @@ public class Category implements Serializable {
     @Column(name = "id")
     private Integer id;
     @Column(name = "name")
+    @Pattern(regexp = "^[\\$_a-zA-Z]+[\\$_\\w\\W]*$", message = "Invalid Category name")
     private String name;
 
     @Column(name = "description")
+    @Pattern(regexp = "^.*$", message = "Invalid Description")
     private String description;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "categoryId", fetch = FetchType.LAZY)

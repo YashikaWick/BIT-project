@@ -3,7 +3,10 @@ package com.assetmanagement.controller;
 import com.assetmanagement.dao.SubcategoryDao;
 import com.assetmanagement.entity.Category;
 import com.assetmanagement.entity.Subcategory;
+import com.assetmanagement.util.ModuleList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +24,14 @@ public class SubcategoryController {
         }
         return null;
     }*/
+
+    @RequestMapping(value = "/subcategories", params = {"page", "size"}, method = RequestMethod.GET, produces = "application/json")
+    public Page<Subcategory> findAll(@CookieValue(value="username") String username, @CookieValue(value="password") String password, @RequestParam("page") int page, @RequestParam("size") int size) {
+        if(AuthProvider.isAuthorized(username,password, ModuleList.SUBCATEGORY,AuthProvider.SELECT)) {
+            return dao.findAll(PageRequest.of(page, size));
+        }
+        return null;
+    }
 
     @RequestMapping(value = "/subcategories/listbycategory",params ="categoryId",method = RequestMethod.GET, produces = "application/json")
     public List<Subcategory> list(@RequestParam("categoryId") Integer categoryId){

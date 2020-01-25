@@ -36,21 +36,10 @@
             btnSearchClear.addEventListener("click",btnSearchClearMC);*/
 
             privilages = httpRequest("../privilages?module=CATEGORY","GET");
-/*
-            regexes = httpRequest("../regexes/employee","GET");
-            txtNumber.setAttribute("data-pattern",regexes.number.regex);
-            txtFullname.setAttribute("data-pattern",regexes.fullname.regex);
-            txtCallingname.setAttribute("data-pattern",regexes.callingname.regex);
-            txtNIC.setAttribute("data-pattern",regexes.nic.regex);
-            txtAddress.setAttribute("data-pattern",regexes.address.regex);
-            txtMobile.setAttribute("data-pattern",regexes.mobile.regex);
-            txtLand.setAttribute("data-pattern",regexes.land.regex);
-            txtDescription.setAttribute("data-pattern",regexes.description.regex);
 
-            genders = httpRequest("../genders/list","GET");
-            designations = httpRequest("../designations/list","GET");
-            civilstatuses = httpRequest("../civilstatuses/list","GET");
-            employeestatuses = httpRequest("../employeestatuses/list","GET");*/
+            regexes = httpRequest("../regexes/category","GET");
+            txtCatName.setAttribute("data-pattern",regexes.name.regex);
+            txtDescription.setAttribute("data-pattern",regexes.description.regex);
 
 
             valid = "#c2ffb2";
@@ -404,7 +393,7 @@
 
                         <div class="col-md-1"></div>
 
-                        <div class="col-md-7" id="branchview">
+                        <div class="col-md-7" id="categoryview">
                             <!--<form class="form-inline" onsubmit="return false">
                                 <div class="form-group form-group-sm">
                                     <input placeholder="Search By Name" class="form-control" type="text" id="txtSearchName"/>

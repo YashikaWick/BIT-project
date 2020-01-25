@@ -16,4 +16,5 @@ public interface SubcategoryDao extends JpaRepository<Subcategory, Integer> {
 
     @Query(value="SELECT new Subcategory (e.id,e.name) FROM Subcategory e")
     List<Subcategory> list();
+
 }
