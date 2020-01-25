@@ -12,6 +12,6 @@ public interface CategoryDao extends JpaRepository<Category, Integer> {
     @Query(value="SELECT new Category (c.id,c.name) FROM Category c")
     List<Category> list();
 
-    @Query(value = "SELECT new Category (c.id,c.name) FROM Category c WHERE c.name:=name")
+    @Query(value = "SELECT new Category (c.id,c.name) FROM Category c WHERE c.name= :name")
     List<Category> findByName(@Param("name")String name);
 }
