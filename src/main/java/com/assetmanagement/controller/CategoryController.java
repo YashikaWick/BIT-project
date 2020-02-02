@@ -39,9 +39,6 @@ public class CategoryController {
 
         if(AuthProvider.isAuthorized(username,password,ModuleList.CATEGORY,AuthProvider.INSERT)) {
 
-
-
-
                 try {
                     dao.save(category);
                     return "0";

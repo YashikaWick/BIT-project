@@ -48,7 +48,7 @@
             txtNote.setAttribute("data-pattern",regexes.notes.regex);
 
             branches = httpRequest("../branches/list","GET");
-            assets = httpRequest("../assets/listbybranch");
+            assets = httpRequest("../assets/listbybranch","GET");
             employees = httpRequest("../employees/list","GET");
             assetstatuses = httpRequest("../assetstatuses/list","GET");
 
@@ -134,6 +134,7 @@
          * Form to enter details of asset
          */
         function loadForm() {
+
             checkout = new Object();
             oldcheckout = null;
 
@@ -153,6 +154,7 @@
             fillCombo(cmbNewHolder,"Select new holder",employees,"callingname","");
             fillCombo(cmbNewStatus,"Select new status",assetstatuses,"name","Transferred");
             checkout.assetstatusId = JSON.parse(cmbNewStatus.value);
+            // asset.assetstatusId = JSON.parse(cmbNewStatus.value);
             checkout.assetcheckoutList.assetstatusId = JSON.parse(cmbNewStatus.value);
             cmbNewStatus.disabled=true;
 
@@ -187,6 +189,7 @@
             txtStatus.style.background=initial;
             //txtDescription.value="";
             assetsbybranch = httpRequest("../assets/listbybranch?branchId="+JSON.parse(cmbBranch.value).id,"GET");
+
             fillCombo(cmbAssetCode,"Selecet Code",assetsbybranch,"assetcode","");
 
             fillInnerTable("tblChoutAsset", checkout.assetcheckoutList ,removeItem);
@@ -242,7 +245,7 @@
 
             choutasset = new Object();
             choutasset.assetId = JSON.parse(cmbAssetCode.value);
-
+            console.log(choutasset);
           /*  if(isNaN(txtQuantity.value)){
                 txtQuantity.style.background=invalid;
             }else {
@@ -331,6 +334,8 @@
          */
         function btnAddMC() {
 
+
+
           var errors = getErrors();
 
             if(errors=="") {
@@ -360,12 +365,21 @@
                     "\nCreated by       : " + checkout.employeeId.callingname);
 
                 if(option==true) {
-                    var response = httpRequest("/checkouts","POST",checkout);
+                    // var response = httpRequest("/checkouts","POST",checkout);
+                    var response ="0"
+                    console.log(checkout)
                     if(response=="0"){
-                        toast("<strong>Success!</strong> Saved Successfully","success");
-                        loadForm();
-                        activerowno = 1;
-                        loadSearchedTable();
+                        console.log(checkout)
+                        // var responseFromAsset = httpRequest("/checkouts","POST",checkout);
+                        // if (responseFromAsset=="0"){
+                        //     toast("<strong>Success!</strong> Saved Successfully","success");
+                        //     loadForm();
+                        //     activerowno = 1;
+                        //     loadSearchedTable();
+                        // }
+                        // else{
+                        //     window.alert("Failed to Add as \n\n"+response);
+                        // }
                     }
                     else window.alert("Failed to Add as \n\n"+response);
                 }

@@ -99,6 +99,7 @@ public class  AssetController {
             String porderNumber="";
             if(poNumber<9)
                 porderNumber = "0000"+(poNumber+1);
+                
             else if(poNumber<99)
                 porderNumber = "000"+(poNumber+1);
             else if(poNumber<999)
