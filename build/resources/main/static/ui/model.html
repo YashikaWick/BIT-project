@@ -37,14 +37,8 @@
 
             privilages = httpRequest("../privilages?module=MODEL","GET");
 
-            regexes = httpRequest("../regexes/employee","GET");
-            txtNumber.setAttribute("data-pattern",regexes.number.regex);
-            txtFullname.setAttribute("data-pattern",regexes.fullname.regex);
-            txtCallingname.setAttribute("data-pattern",regexes.callingname.regex);
-            txtNIC.setAttribute("data-pattern",regexes.nic.regex);
-            txtAddress.setAttribute("data-pattern",regexes.address.regex);
-            txtMobile.setAttribute("data-pattern",regexes.mobile.regex);
-            txtLand.setAttribute("data-pattern",regexes.land.regex);
+            regexes = httpRequest("../regexes/model","GET");
+            txtModelName.setAttribute("data-pattern",regexes.name.regex);
             txtDescription.setAttribute("data-pattern",regexes.description.regex);
 
             brands = httpRequest("../brands/list","GET");
@@ -177,7 +171,7 @@
                 var option = window.confirm("Are you sure to add following Employee ?\n" +
                     "\nName          : " + model.name +
                     "\nBrand        : " + model.brandId.name +
-                    "\nDescription     : " + employee.description );
+                    "\nDescription     : " + model.description );
                 if(option==true) {
                   var response = httpRequest("/models","POST",model);
                     if(response=="0"){
@@ -421,12 +415,12 @@
 <div class="container-fluid">
     <div class="row" id="ui">
         <div class="col-md-12">
-            <div class="panel panel-default" style="margin-top: 10px;">
-                <div class="panel-heading">
-                    <h3>New Model</h3>
+            <div class="card " style="margin-top: 10px;">
+                <div class="card-header">
+                    <h3>Model</h3>
                 </div>
 
-                <div class="panel-body" >
+                <div class="card-body" >
                     <div class="row">
 
                         <div class="col-md-4" id="form">
@@ -457,8 +451,8 @@
 
                         <div class="col-md-1"></div>
 
-                        <div class="col-md-7" id="employeeview">
-                            <form class="form-inline" onsubmit="return false">
+                        <div class="col-md-7" id="modelview">
+                            <!--<form class="form-inline" onsubmit="return false">
                                 <div class="form-group form-group-sm">
                                     <input placeholder="Search By Name" class="form-control" type="text" id="txtSearchName"/>
                                 </div>
@@ -475,7 +469,7 @@
                                 <input type="button" class="btn btn-primary btn-sm" value="Search" id="btnSearch"/>
                                 <input type="button" class="btn btn-secondary btn-sm" value="Clear" id="btnSearchClear"/>
 
-                            </form>
+                            </form>-->
                             <hr/>
                             <div class="table-responsive" id="tableParent">
 
@@ -497,7 +491,7 @@
 
                 </div>
 
-                <div class="panel-footer">
+                <div class="card-footer">
                     <div id="err">
                         <h3>Error Log</h3>
                     </div>

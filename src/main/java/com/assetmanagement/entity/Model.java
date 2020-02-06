@@ -23,6 +23,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -43,10 +44,15 @@ public class Model implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+
     @Column(name = "name")
+    @Pattern(regexp = "^[\\$_a-zA-Z]+[\\$_\\w\\W]*$", message = "Invalid Model name")
     private String name;
+
     @Column(name = "description")
+    @Pattern(regexp = "^.*$", message = "Invalid Description")
     private String description;
+
     @JoinColumn(name = "brand_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Brand brandId;
