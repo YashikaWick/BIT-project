@@ -26,16 +26,16 @@
         //Initializing Functions
 
         function initialize() {
-/*
+
             btnAdd.addEventListener("click",btnAddMC);
-            btnClear.addEventListener("click",btnClearMC);
+    /*        btnClear.addEventListener("click",btnClearMC);
             btnUpdate.addEventListener("click",btnUpdateMC);
             btnDelete.addEventListener("click",btnDeleteMC);
             dteDOBirth.onchange = dteDOBirthCH;
             btnSearch.addEventListener("click",btnSearchMC);
-            btnSearchClear.addEventListener("click",btnSearchClearMC);
+            btnSearchClear.addEventListener("click",btnSearchClearMC);*/
 
-            privilages = httpRequest("../privilages?module=EMPLOYEE","GET");
+            privilages = httpRequest("../privilages?module=MODEL","GET");
 
             regexes = httpRequest("../regexes/employee","GET");
             txtNumber.setAttribute("data-pattern",regexes.number.regex);
@@ -47,20 +47,16 @@
             txtLand.setAttribute("data-pattern",regexes.land.regex);
             txtDescription.setAttribute("data-pattern",regexes.description.regex);
 
-            genders = httpRequest("../genders/list","GET");
-            designations = httpRequest("../designations/list","GET");
-            civilstatuses = httpRequest("../civilstatuses/list","GET");
-            employeestatuses = httpRequest("../employeestatuses/list","GET");
-
+            brands = httpRequest("../brands/list","GET");
 
             valid = "#c2ffb2";
             invalid = "#ffe1e1";
             initial = "white";
             updated = "#fcf5b5";
-            active = "#fcf5b5";*/
+            active = "#fcf5b5";
 
             loadView();
-           // loadForm();
+            loadForm();
 
 
 
@@ -69,38 +65,38 @@
         function loadView() {
 
             //Search Area
-            txtSearchName.value="";
+           /* txtSearchName.value="";
             txtSearchNIC.value="";
             fillCombo(cmbSearchDesignation,"Designation",designations,"name","");
             fillCombo(cmbSearchEmployeestatus,"Status",employeestatuses,"name","");
             cmbSearchEmployeestatus.style.background = "";
             cmbSearchDesignation.style.background = "";
             txtSearchName.style.background = "";
-            txtSearchNIC.style.background = "";
+            txtSearchNIC.style.background = "";*/
 
 
             //Table Area
             activerowno = "";
             activepage = 1;
-            var query = "&name=&nic=&designationid=&employeestatusid=";
+            var query = "&name=";
             loadTable(1,cmbPageSize.value,query);
         }
 
         function loadTable(page,size,query) {
             page = page - 1;
-            employees = new Array();
-            var data = httpRequest("/employees?page="+page+"&size="+size+query,"GET");
-            if(data.content!= undefined) employees = data.content;
+            models = new Array();
+            var data = httpRequest("/models?page="+page+"&size="+size+query,"GET");
+            if(data.content!= undefined) models = data.content;
             createPagination('pagination',data.totalPages, data.number+1,paginate);
-            fillTable('tblEmployee',employees,fillForm);
-            clearSelection(tblEmployee);
-            if(activerowno!="")selectRow(tblEmployee,activerowno,active);
+            fillTable('tblModel',models,fillForm);
+            clearSelection(tblModel);
+            if(activerowno!="")selectRow(tblModel,activerowno,active);
             window.location.href="#ui";
         }
 
         function paginate(page) {
             var paginate;
-            if(oldemployee==null){
+            if(oldmodel==null){
                 paginate=true;
             }else{
                 if(getErrors()==''&&getUpdates()==''){
@@ -120,62 +116,24 @@
         }
 
         function loadForm() {
-            employee = new Object();
-            oldemployee = null;
+            model = new Object();
+            oldmodel = null;
 
-            fillCombo(cmbGender,"Select Gender",genders,"name","");
-            fillCombo(cmbDesignation,"Select Designation",designations,"name","");
-            fillCombo(cmbCivilstatus,"Select Civil Status",civilstatuses,"name","");
+            fillCombo(cmbBrand,"Select Brand",brands,"name","");
 
-            fillCombo(cmbEmployeestatus,"",employeestatuses,"name","Working");
-            employee.employeestatusId=JSON.parse(cmbEmployeestatus.value);
-
-
-            var today = new Date();
-            var month = today.getMonth()+1;
-            if(month<10) month = "0"+month;
-            var date = today.getDate()+1;
-            if(date<10) date = "0"+date;
-
-            dteDOAssignment.value=today.getFullYear()+"-"+month+"-"+date;
-            employee.doassignment=dteDOAssignment.value;
-
-            txtNumber.value = "";
-            txtNumber.disabled="";
-            txtFullname.value = "";
-            txtCallingname.value = "";
-            dteDOBirth.value = "";
-            txtNIC.value = "";
-            txtAddress.value = "";
-            txtMobile.value = "";
-            txtLand.value = "";
-
+            txtModelName.value = "";
             txtDescription.value = "";
-            removeFile('flePhoto');
 
             setStyle(initial);
-            cmbEmployeestatus.style.background=valid;
-            dteDOAssignment.style.background=valid;
 
             disableButtons(false, true, true);
         }
 
         function setStyle(style) {
 
-            txtNumber.style.background = style;
-            txtFullname.style.background = style;
-            txtCallingname.style.background = style;
-            cmbGender.style.background = style;
-            cmbCivilstatus.style.background = style;
-            txtNIC.style.background = style;
-            dteDOBirth.style.background = style;
-            txtAddress.style.background = style;
-            txtMobile.style.background = style;
-            txtLand.style.background = style;
-            cmbDesignation.style.background = style;
-            dteDOAssignment.style.background = style;
+            txtModelName.style.background = style;
             txtDescription.style.background = style;
-            cmbEmployeestatus.style.background = style;
+            cmbBrand.style.background = style;
 
         }
 
@@ -193,73 +151,17 @@
         }
 
 
-        // Binding and Validation Functions for Non-Regex-Based
-        // When Regex-Based default validation is used, programmers do not need to define these functions
-        // Default Validation and Binding is coded in "ui.bitproject.earth.lk.js"
-
-        function dteDOBirthCH() {
-            var today = new Date();
-            var birthday = new Date(dteDOBirth.value);
-            if((today.getTime()-birthday.getTime())>(18*365*24*3600*1000)) {
-                employee.dobirth = dteDOBirth.value;
-                dteDOBirth.style.background = valid;
-            }
-            else
-            {
-                employee.dobirth = null;
-                dteDOBirth.style.background = invalid;
-            }
-        }
-
-
-
         //Form Operation Functions
         
         function getErrors() {
 
             var errors = "";
 
-            if (employee.number == null)
+            if (model.name == null)
                 errors = errors + "\n" + regexes.number.message;
 
-            if (employee.fullname == null)
-                errors = errors + "\n" + regexes.fullname.message;
-
-            if (employee.nic == null)
-                errors = errors + "\n" + regexes.nic.message;
-
-            if (employee.callingname == null)
-                errors = errors + "\n" + regexes.callingname.message;
-
-            if (employee.genderId == null)
-                errors = errors + "\n" + "Gender Not Selected";
-
-            if (employee.civilstatusId == null)
-                errors = errors + "\n" + "Civilstatus Not Selected";
-
-            if (employee.dobirth == null)
-                errors = errors + "\n" + "Birth Date Invalid";
-
-            if (employee.address == null)
-                errors = errors + "\n" + regexes.address.message;
-
-            if (employee.mobile == null)
-                errors = errors + "\n" + regexes.mobile.message;
-
-            if (employee.land== null && txtLand.value!="")
-                errors = errors + "\n" + regexes.land.message;
-
-            if (employee.designationId == null)
-                errors = errors + "\n" + "Designation Not Selected";
-
-            if (employee.doassignment == null)
-                errors = errors + "\n" + "Assignment Date Invalid";
-
-            if (employee.description == null && txtDescription.value!="")
+            if (model.description == null && txtDescription.value!="")
                 errors = errors + "\n" + regexes.description.message;
-
-            if (employee.employeestatusId == null)
-                errors = errors + "\n" + "Employeestatus Not Selected";
 
 
             return errors;
@@ -273,23 +175,11 @@
 
            if(errors=="") {
                 var option = window.confirm("Are you sure to add following Employee ?\n" +
-                    "\nNumber          : " + employee.number +
-                    "\nFull Name       : " + employee.fullname +
-                    "\nCalling Name    : " + employee.callingname +
-                    "\nGender          : " + employee.genderId.name +
-                    "\nCivil Status    : " + employee.civilstatusId.name +
-                    "\nNIC             : " + employee.nic +
-                    "\nBirth Date      : " + employee.dobirth +
-                    "\nPhoto           : " + employee.photoname +
-                    "\nAddress         : " + employee.address +
-                    "\nMobile          : " + employee.mobile +
-                    "\nLand            : " + employee.land +
-                    "\nDesignation     : " + employee.designationId.name +
-                    "\nAssignment Date : " + employee.doassignment +
-                    "\nDescription     : " + employee.description +
-                    "\nEmployee Status : " + employee.employeestatusId.name);
+                    "\nName          : " + model.name +
+                    "\nBrand        : " + model.brandId.name +
+                    "\nDescription     : " + employee.description );
                 if(option==true) {
-                  var response = httpRequest("/employees","POST",employee);
+                  var response = httpRequest("/models","POST",model);
                     if(response=="0"){
                     toast("<strong>Success !</strong> Saved Successfully","success");
                     loadForm();
@@ -547,11 +437,9 @@
                                  // Defining UI-Componnets and Layouts
                                  // Default UI-Componnets and Layouts is coded in "ui.bitproject.earth.lk.js"
 
-                                 textField('modelform','','Model Name','Enter Branch-Name Here','',4,"",'','','');
-                                 comboBox('modelform','','Brand',4,'','','');
-                                 textArea('modelform','txtDescription','Description','Enter Description Here','',4,"",'','','');
-
-
+                                 textField('modelform','txtModelName','Model Name','Enter Branch-Name Here','',4,"",'model','name','oldmodel');
+                                 comboBox('modelform','cmbBrand','Brand',4,'model','brandId','oldmodel');
+                                 textArea('modelform','txtDescription','Description','Enter Description Here','',4,"",'model','description','oldmodel');
 
                                 </script>
 
@@ -593,19 +481,11 @@
 
                                 <script>
 
-                                    function getNameColumn(ob) {
-                                        return ob.callingname+"("+ob.number+")";
-                                    }
 
                                     var metadata = [
-                                        {name:'Number',search:true,datatype:'text',property:'number'},
-                                        {name:'Name',search:true,datatype:'text',property:getNameColumn},
-                                        {name:'Photo',search:false,datatype:'photo',property:'photo'},
-                                        {name:'NIC',search:true,datatype:'text',property:'nic'},
-                                        {name:'Mobile',search:true,datatype:'text',property:'mobile'},
-                                        {name:'Designation',search:true,datatype:'text',property:'designationId.name'}
+                                        {name:'Name',search:true,datatype:'text',property:'name'}
                                     ];
-                                    table("tableParent","tblEmployee",metadata,[3,10,15,30,500,1000],btnSearchMC,true);
+                                    table("tableParent","tblModel",metadata,[3,10,15,30,500,1000],btnSearchMC,true);
 
                                 </script>
 

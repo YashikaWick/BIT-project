@@ -51,6 +51,9 @@ public class RegexController {
     @RequestMapping(value = "/brand", produces = "application/json")
     public HashMap<String, HashMap<String, String>> brand() { return getRegex(new Brand()); }
 
+    @RequestMapping(value = "/model", produces = "application/json")
+    public HashMap<String, HashMap<String, String>> model() { return getRegex(new Model()); }
+
 
     public static <T> HashMap<String, HashMap<String, String>> getRegex(T t) {
         try {
