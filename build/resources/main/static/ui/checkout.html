@@ -194,6 +194,8 @@
 
             fillInnerTable("tblChoutAsset", checkout.assetcheckoutList ,removeItem);
 
+
+
         }
 
 
@@ -245,7 +247,7 @@
 
             choutasset = new Object();
             choutasset.assetId = JSON.parse(cmbAssetCode.value);
-            console.log(choutasset);
+
           /*  if(isNaN(txtQuantity.value)){
                 txtQuantity.style.background=invalid;
             }else {
@@ -341,21 +343,21 @@
             if(errors=="") {
                 var assetlist="";
                 for(x in checkout.assetcheckoutList)
-                    assetlist = assetlist + (assetlist==""?"":", ") +checkout.assetcheckoutList[x].assetId.name
+                    assetlist = assetlist + (assetlist==""?"":", ") +checkout.assetcheckoutList[x].assetId.name;
 
-                var assetcodelist="";
+                /*var assetcodelist="";
                 for(x in checkout.assetcheckoutList)
                     assetcodelist = assetcodelist + (assetcodelist==""?"":", ") +checkout.assetcheckoutList[x].assetId.assetcode
 
                 var assetstatuslist="";
                 for(x in checkout.assetcheckoutList)
-                    assetstatuslist = assetstatuslist + (assetstatuslist==""?"":", ") +checkout.assetcheckoutList[x].assetId.assetstatusId.name
+                    assetstatuslist = assetstatuslist + (assetstatuslist==""?"":", ") +checkout.assetcheckoutList[x].assetId.assetstatusId.name*/
 
                 var option = window.confirm("Are you sure to add following checkout ?\n" +
                     "\nCheckout No      : " + checkout.checkoutno+
-                    "\nAsset Code       : " + assetcodelist+
+                    // "\nAsset Code       : " + assetcodelist+
                     "\nAsset Name       : " + assetlist +
-                    "\nAsset Status     : " + assetstatuslist +
+                    //"\nAsset Status     : " + assetstatuslist +
                     "\nNew Branch       : " + checkout.branchId.name +
                     "\nNew Holder       : " + checkout.newholderId.callingname +
                     "\nNew Asset status : " + checkout.assetstatusId.name +
@@ -365,21 +367,21 @@
                     "\nCreated by       : " + checkout.employeeId.callingname);
 
                 if(option==true) {
-                    // var response = httpRequest("/checkouts","POST",checkout);
+                    var response = httpRequest("/checkouts","POST",checkout);
                     var response ="0"
-                    console.log(checkout)
+
                     if(response=="0"){
-                        console.log(checkout)
-                        // var responseFromAsset = httpRequest("/checkouts","POST",checkout);
-                        // if (responseFromAsset=="0"){
-                        //     toast("<strong>Success!</strong> Saved Successfully","success");
-                        //     loadForm();
-                        //     activerowno = 1;
-                        //     loadSearchedTable();
-                        // }
-                        // else{
-                        //     window.alert("Failed to Add as \n\n"+response);
-                        // }
+
+                        var responseFromAsset = httpRequest("/checkouts","POST",checkout);
+                        if (responseFromAsset=="0"){
+                            toast("<strong>Success!</strong> Saved Successfully","success");
+                            loadForm();
+                            activerowno = 1;
+                            loadSearchedTable();
+                        }
+                        else{
+                            window.alert("Failed to Add as \n\n"+response);
+                        }
                     }
                     else window.alert("Failed to Add as \n\n"+response);
                 }
